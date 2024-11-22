@@ -47,11 +47,15 @@ public partial class User
 
     public int LoginStatus { get; set; }
 
+    public virtual ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
+
     public virtual ICollection<FriendRequest> FriendRequestReceiverNavigations { get; set; } = new List<FriendRequest>();
 
     public virtual ICollection<FriendRequest> FriendRequestSenderNavigations { get; set; } = new List<FriendRequest>();
 
     public virtual ICollection<Game> Games { get; set; } = new List<Game>();
+
+    public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 
     public virtual LoginStatus LoginStatusNavigation { get; set; } = null!;
 

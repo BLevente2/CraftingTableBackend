@@ -15,7 +15,7 @@ public partial class Game
 
     public int AgeRestriction { get; set; }
 
-    public string GameRules { get; set; } = null!;
+    public string GamePreview { get; set; } = null!;
 
     public string GameAssetsToken { get; set; } = null!;
 
@@ -24,6 +24,8 @@ public partial class Game
     public virtual AgeRestriction AgeRestrictionNavigation { get; set; } = null!;
 
     public virtual User CreatorUserNavigation { get; set; } = null!;
+
+    public virtual ICollection<GameVersion> GameVersions { get; set; } = new List<GameVersion>();
 
     public virtual GameVisibility GameVisiblilityNavigation { get; set; } = null!;
 

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using CraftingTableBackend.Models;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
-namespace CraftingTableBackend.Models;
+namespace CraftingTableBackend.Context;
 
 public partial class CraftingtableContext : DbContext
 {
@@ -18,13 +19,23 @@ public partial class CraftingtableContext : DbContext
 
     public virtual DbSet<AgeRestriction> AgeRestrictions { get; set; }
 
+    public virtual DbSet<ChatMessage> ChatMessages { get; set; }
+
     public virtual DbSet<FriendRequest> FriendRequests { get; set; }
 
     public virtual DbSet<FriendRequestStatus> FriendRequestStatuses { get; set; }
 
     public virtual DbSet<Game> Games { get; set; }
 
+    public virtual DbSet<GameIssue> GameIssues { get; set; }
+
+    public virtual DbSet<GamePublicProfile> GamePublicProfiles { get; set; }
+
+    public virtual DbSet<GameVersion> GameVersions { get; set; }
+
     public virtual DbSet<GameVisibility> GameVisibilities { get; set; }
+
+    public virtual DbSet<Invoice> Invoices { get; set; }
 
     public virtual DbSet<LoginStatus> LoginStatuses { get; set; }
 
@@ -38,11 +49,13 @@ public partial class CraftingtableContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserFavourite> UserFavourites { get; set; }
+
     public virtual DbSet<UserFirend> UserFirends { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=localhost;port=3306;database=craftingtable;user=root;ssl mode=none", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.4.32-mariadb"));
+        => optionsBuilder.UseMySql("server=localhost;port=3306;database=craftingtable;user=root;ssl mode=none", ServerVersion.Parse("10.4.32-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -65,6 +78,51 @@ public partial class CraftingtableContext : DbContext
             entity.Property(e => e.Description)
                 .HasColumnType("text")
                 .HasColumnName("description");
+        });
+
+        modelBuilder.Entity<ChatMessage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("chat_message");
+
+            entity.HasIndex(e => e.Session, "chat");
+
+            entity.HasIndex(e => e.Answered, "message_answered");
+
+            entity.HasIndex(e => e.Sender, "message_sender");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.Answered)
+                .HasColumnType("int(11)")
+                .HasColumnName("answered");
+            entity.Property(e => e.Message)
+                .HasColumnType("text")
+                .HasColumnName("message");
+            entity.Property(e => e.SendDate).HasColumnName("send_date");
+            entity.Property(e => e.Sender)
+                .HasColumnType("int(11)")
+                .HasColumnName("sender");
+            entity.Property(e => e.Session)
+                .HasColumnType("int(11)")
+                .HasColumnName("session");
+
+            entity.HasOne(d => d.AnsweredNavigation).WithMany(p => p.InverseAnsweredNavigation)
+                .HasForeignKey(d => d.Answered)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("answered_message");
+
+            entity.HasOne(d => d.SenderNavigation).WithMany(p => p.ChatMessages)
+                .HasForeignKey(d => d.Sender)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("message_sender");
+
+            entity.HasOne(d => d.SessionNavigation).WithMany(p => p.ChatMessages)
+                .HasForeignKey(d => d.Session)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("chat");
         });
 
         modelBuilder.Entity<FriendRequest>(entity =>
@@ -153,9 +211,9 @@ public partial class CraftingtableContext : DbContext
             entity.Property(e => e.GameAssetsToken)
                 .HasColumnType("text")
                 .HasColumnName("game_assets_token");
-            entity.Property(e => e.GameRules)
+            entity.Property(e => e.GamePreview)
                 .HasColumnType("text")
-                .HasColumnName("game_rules");
+                .HasColumnName("game_preview");
             entity.Property(e => e.GameScript)
                 .HasColumnType("text")
                 .HasColumnName("game_script");
@@ -179,6 +237,115 @@ public partial class CraftingtableContext : DbContext
                 .HasConstraintName("game_visiblility_type");
         });
 
+        modelBuilder.Entity<GameIssue>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("game_issue");
+
+            entity.HasIndex(e => e.GameVersionId, "game_version_connection");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.DetectionDate).HasColumnName("detection_date");
+            entity.Property(e => e.Fixed)
+                .HasColumnType("int(11)")
+                .HasColumnName("fixed");
+            entity.Property(e => e.GameVersionId)
+                .HasColumnType("int(11)")
+                .HasColumnName("game_version_id");
+            entity.Property(e => e.IssueDetails)
+                .HasColumnType("text")
+                .HasColumnName("issue_details");
+            entity.Property(e => e.IssueName)
+                .HasColumnType("text")
+                .HasColumnName("issue_name");
+
+            entity.HasOne(d => d.GameVersion).WithMany(p => p.GameIssues)
+                .HasForeignKey(d => d.GameVersionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("game_version_connection");
+        });
+
+        modelBuilder.Entity<GamePublicProfile>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("game_public_profile");
+
+            entity.HasIndex(e => e.LastVersion, "last_verson_of_game");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.AssetsToken)
+                .HasColumnType("text")
+                .HasColumnName("assets_token");
+            entity.Property(e => e.Description)
+                .HasColumnType("text")
+                .HasColumnName("description");
+            entity.Property(e => e.LastModifiedDate).HasColumnName("last_modified_date");
+            entity.Property(e => e.LastVersion)
+                .HasColumnType("int(11)")
+                .HasColumnName("last_version");
+            entity.Property(e => e.Name)
+                .HasColumnType("text")
+                .HasColumnName("name");
+            entity.Property(e => e.NumOfReviews)
+                .HasColumnType("int(11)")
+                .HasColumnName("num_of_reviews");
+            entity.Property(e => e.NumOfStars)
+                .HasColumnType("int(11)")
+                .HasColumnName("num_of_stars");
+            entity.Property(e => e.NumOfViews)
+                .HasColumnType("int(11)")
+                .HasColumnName("num_of_views");
+            entity.Property(e => e.ShareDate).HasColumnName("share_date");
+
+            entity.HasOne(d => d.LastVersionNavigation).WithMany(p => p.GamePublicProfiles)
+                .HasForeignKey(d => d.LastVersion)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("last_verson_of_game");
+        });
+
+        modelBuilder.Entity<GameVersion>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("game_version");
+
+            entity.HasIndex(e => e.GameId, "verson_of_game");
+
+            entity.HasIndex(e => e.PublicProfileId, "verson_of_public_profile");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.ChangeLog)
+                .HasColumnType("text")
+                .HasColumnName("change_log");
+            entity.Property(e => e.GameId)
+                .HasColumnType("int(11)")
+                .HasColumnName("game_id");
+            entity.Property(e => e.PublicProfileId)
+                .HasColumnType("int(11)")
+                .HasColumnName("public_profile_id");
+            entity.Property(e => e.VersionName)
+                .HasColumnType("text")
+                .HasColumnName("version_name");
+
+            entity.HasOne(d => d.Game).WithMany(p => p.GameVersions)
+                .HasForeignKey(d => d.GameId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("verson_of_game");
+
+            entity.HasOne(d => d.PublicProfile).WithMany(p => p.GameVersions)
+                .HasForeignKey(d => d.PublicProfileId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("verson_of_public_profile");
+        });
+
         modelBuilder.Entity<GameVisibility>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -194,6 +361,40 @@ public partial class CraftingtableContext : DbContext
             entity.Property(e => e.Visibility)
                 .HasColumnType("text")
                 .HasColumnName("visibility");
+        });
+
+        modelBuilder.Entity<Invoice>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("invoice");
+
+            entity.HasIndex(e => e.UserId, "invoice_user");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.Completed)
+                .HasColumnType("int(11)")
+                .HasColumnName("completed");
+            entity.Property(e => e.CreationDate).HasColumnName("creation_date");
+            entity.Property(e => e.SubscriptionTier)
+                .HasColumnType("int(11)")
+                .HasColumnName("subscription_tier");
+            entity.Property(e => e.SubscriptionType)
+                .HasColumnType("int(11)")
+                .HasColumnName("subscription_type");
+            entity.Property(e => e.Total)
+                .HasColumnType("int(11)")
+                .HasColumnName("total");
+            entity.Property(e => e.UserId)
+                .HasColumnType("int(11)")
+                .HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Invoices)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("invoice_user");
         });
 
         modelBuilder.Entity<LoginStatus>(entity =>
@@ -421,6 +622,31 @@ public partial class CraftingtableContext : DbContext
                 .HasForeignKey(d => d.TwoFactorType)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("user_two_factor");
+        });
+
+        modelBuilder.Entity<UserFavourite>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("user_favourite");
+
+            entity.HasIndex(e => e.GamePublicProfileId, "public_profile_id");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.BecameFavourite).HasColumnName("became_favourite");
+            entity.Property(e => e.GamePublicProfileId)
+                .HasColumnType("int(11)")
+                .HasColumnName("game_public_profile_id");
+            entity.Property(e => e.UserId)
+                .HasColumnType("int(11)")
+                .HasColumnName("user_id");
+
+            entity.HasOne(d => d.GamePublicProfile).WithMany(p => p.UserFavourites)
+                .HasForeignKey(d => d.GamePublicProfileId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("public_profile_id");
         });
 
         modelBuilder.Entity<UserFirend>(entity =>

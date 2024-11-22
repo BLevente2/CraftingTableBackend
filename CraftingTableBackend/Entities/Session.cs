@@ -25,6 +25,8 @@ public partial class Session
 
     public DateOnly? SessionEnd { get; set; }
 
+    public virtual ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
+
     public virtual Game GameNavigation { get; set; } = null!;
 
     public virtual User HostUserNavigation { get; set; } = null!;
