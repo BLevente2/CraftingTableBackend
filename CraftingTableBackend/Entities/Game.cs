@@ -9,7 +9,7 @@ public partial class Game
 
     public int CreatorUser { get; set; }
 
-    public int GameVisiblility { get; set; }
+    public int GameVisibility { get; set; }
 
     public int AgeRestricted { get; set; }
 
@@ -27,7 +27,7 @@ public partial class Game
 
     public virtual ICollection<GameVersion> GameVersions { get; set; } = new List<GameVersion>();
 
-    public virtual GameVisibility GameVisiblilityNavigation { get; set; } = null!;
+    public virtual GameVisibility GameVisibilityNavigation { get; set; } = null!;
 
     public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
 }

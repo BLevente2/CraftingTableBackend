@@ -17,7 +17,7 @@ public partial class User
 
     public string? TwoFactorToken { get; set; }
 
-    public string EmailAdress { get; set; } = null!;
+    public string EmailAddress { get; set; } = null!;
 
     public string? PhoneNumber { get; set; }
 
@@ -25,7 +25,7 @@ public partial class User
 
     public int SubscriptionTier { get; set; }
 
-    public int? SubcriptionType { get; set; }
+    public int? SubscriptionType { get; set; }
 
     public string? SubscriptionToken { get; set; }
 
@@ -67,7 +67,7 @@ public partial class User
 
     public virtual TwoFactorType? TwoFactorTypeNavigation { get; set; }
 
-    public virtual ICollection<UserFirend> UserFirendFriends { get; set; } = new List<UserFirend>();
+    public virtual ICollection<UserFriend> UserFriendFriends { get; set; } = new List<UserFriend>();
 
-    public virtual ICollection<UserFirend> UserFirendUsers { get; set; } = new List<UserFirend>();
+    public virtual ICollection<UserFriend> UserFriendUsers { get; set; } = new List<UserFriend>();
 }

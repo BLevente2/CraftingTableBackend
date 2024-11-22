@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CraftingTableBackend.Models;
 
-public partial class UserFirend
+public partial class UserFriend
 {
     public int Id { get; set; }
 

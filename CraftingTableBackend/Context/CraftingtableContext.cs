@@ -51,7 +51,7 @@ public partial class CraftingtableContext : DbContext
 
     public virtual DbSet<UserFavourite> UserFavourites { get; set; }
 
-    public virtual DbSet<UserFirend> UserFirends { get; set; }
+    public virtual DbSet<UserFriend> UserFriends { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -194,7 +194,7 @@ public partial class CraftingtableContext : DbContext
 
             entity.HasIndex(e => e.CreatorUser, "game_creator_connection");
 
-            entity.HasIndex(e => e.GameVisiblility, "game_visiblility_type");
+            entity.HasIndex(e => e.GameVisibility, "game_visiblility_type");
 
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
@@ -217,9 +217,9 @@ public partial class CraftingtableContext : DbContext
             entity.Property(e => e.GameScript)
                 .HasColumnType("text")
                 .HasColumnName("game_script");
-            entity.Property(e => e.GameVisiblility)
+            entity.Property(e => e.GameVisibility)
                 .HasColumnType("int(11)")
-                .HasColumnName("game_visiblility");
+                .HasColumnName("game_visibility");
 
             entity.HasOne(d => d.AgeRestrictionNavigation).WithMany(p => p.Games)
                 .HasForeignKey(d => d.AgeRestriction)
@@ -231,8 +231,8 @@ public partial class CraftingtableContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("game_creator_connection");
 
-            entity.HasOne(d => d.GameVisiblilityNavigation).WithMany(p => p.Games)
-                .HasForeignKey(d => d.GameVisiblility)
+            entity.HasOne(d => d.GameVisibilityNavigation).WithMany(p => p.Games)
+                .HasForeignKey(d => d.GameVisibility)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("game_visiblility_type");
         });
@@ -424,7 +424,7 @@ public partial class CraftingtableContext : DbContext
 
             entity.HasIndex(e => e.Game, "session_game");
 
-            entity.HasIndex(e => e.SessionVisiblility, "session_visibility_type");
+            entity.HasIndex(e => e.SessionVisibility, "session_visibility_type");
 
             entity.HasIndex(e => e.WinnerUser, "session_winner");
 
@@ -448,9 +448,9 @@ public partial class CraftingtableContext : DbContext
                 .HasColumnType("text")
                 .HasColumnName("session_join_token");
             entity.Property(e => e.SessionStart).HasColumnName("session_start");
-            entity.Property(e => e.SessionVisiblility)
+            entity.Property(e => e.SessionVisibility)
                 .HasColumnType("int(11)")
-                .HasColumnName("session_visiblility");
+                .HasColumnName("session_visibility");
             entity.Property(e => e.WinnerUser)
                 .HasColumnType("int(11)")
                 .HasColumnName("winner_user");
@@ -465,8 +465,8 @@ public partial class CraftingtableContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("host");
 
-            entity.HasOne(d => d.SessionVisiblilityNavigation).WithMany(p => p.Sessions)
-                .HasForeignKey(d => d.SessionVisiblility)
+            entity.HasOne(d => d.SessionVisibilityNavigation).WithMany(p => p.Sessions)
+                .HasForeignKey(d => d.SessionVisibility)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("session_visibility_type");
 
@@ -559,9 +559,9 @@ public partial class CraftingtableContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
             entity.Property(e => e.BirthDate).HasColumnName("birth_date");
-            entity.Property(e => e.EmailAdress)
+            entity.Property(e => e.EmailAddress)
                 .HasColumnType("text")
-                .HasColumnName("email_adress");
+                .HasColumnName("email_address");
             entity.Property(e => e.FirstName)
                 .HasColumnType("text")
                 .HasColumnName("first_name");
@@ -594,15 +594,15 @@ public partial class CraftingtableContext : DbContext
             entity.Property(e => e.Salt)
                 .HasColumnType("text")
                 .HasColumnName("salt");
-            entity.Property(e => e.SubcriptionType)
-                .HasColumnType("int(11)")
-                .HasColumnName("subcription_type");
             entity.Property(e => e.SubscriptionTier)
                 .HasColumnType("int(11)")
                 .HasColumnName("subscription_tier");
             entity.Property(e => e.SubscriptionToken)
                 .HasColumnType("text")
                 .HasColumnName("subscription_token");
+            entity.Property(e => e.SubscriptionType)
+                .HasColumnType("int(11)")
+                .HasColumnName("subscription_type");
             entity.Property(e => e.TwoFactorToken)
                 .HasColumnType("text")
                 .HasColumnName("two_factor_token");
@@ -649,11 +649,11 @@ public partial class CraftingtableContext : DbContext
                 .HasConstraintName("public_profile_id");
         });
 
-        modelBuilder.Entity<UserFirend>(entity =>
+        modelBuilder.Entity<UserFriend>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("user_firend");
+            entity.ToTable("user_friend");
 
             entity.HasIndex(e => e.FriendId, "friend_connection");
 
@@ -673,12 +673,12 @@ public partial class CraftingtableContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("user_id");
 
-            entity.HasOne(d => d.Friend).WithMany(p => p.UserFirendFriends)
+            entity.HasOne(d => d.Friend).WithMany(p => p.UserFriendFriends)
                 .HasForeignKey(d => d.FriendId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("friend_connection");
 
-            entity.HasOne(d => d.User).WithMany(p => p.UserFirendUsers)
+            entity.HasOne(d => d.User).WithMany(p => p.UserFriendUsers)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("user_connection");

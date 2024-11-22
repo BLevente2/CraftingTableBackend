@@ -17,7 +17,7 @@ public partial class Session
 
     public int SessionEnded { get; set; }
 
-    public int SessionVisiblility { get; set; }
+    public int SessionVisibility { get; set; }
 
     public int WinnerUser { get; set; }
 
@@ -33,7 +33,7 @@ public partial class Session
 
     public virtual ICollection<SessionConnection> SessionConnections { get; set; } = new List<SessionConnection>();
 
-    public virtual SessionVisibility SessionVisiblilityNavigation { get; set; } = null!;
+    public virtual SessionVisibility SessionVisibilityNavigation { get; set; } = null!;
 
     public virtual User WinnerUserNavigation { get; set; } = null!;
 }
